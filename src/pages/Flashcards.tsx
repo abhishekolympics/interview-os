@@ -82,6 +82,7 @@ function FlashCard({ card }: { card: Flashcard }) {
 export default function Flashcards() {
   const [activeDeck, setActiveDeck] = useState<number | null>(null);
   const [cardIdx, setCardIdx] = useState(0);
+  const [slideDir, setSlideDir] = useState<'left' | 'right'>('right');
 
   const deckCards = activeDeck !== null
     ? flashcards.filter(c => c.deck === activeDeck)
@@ -89,8 +90,14 @@ export default function Flashcards() {
 
   const current = deckCards[cardIdx] ?? null;
 
-  const prev = useCallback(() => setCardIdx(i => Math.max(0, i - 1)), []);
-  const next = useCallback(() => setCardIdx(i => Math.min(deckCards.length - 1, i + 1)), [deckCards.length]);
+  const prev = useCallback(() => {
+    setSlideDir('left');
+    setCardIdx(i => Math.max(0, i - 1));
+  }, []);
+  const next = useCallback(() => {
+    setSlideDir('right');
+    setCardIdx(i => Math.min(deckCards.length - 1, i + 1));
+  }, [deckCards.length]);
 
   const selectDeck = (id: number | null) => {
     setActiveDeck(id);
@@ -169,7 +176,12 @@ export default function Flashcards() {
             />
           </div>
 
-          <FlashCard key={`${current.id}-${cardIdx}`} card={current} />
+          <div
+            key={`${current.id}-${cardIdx}`}
+            className={slideDir === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left'}
+          >
+            <FlashCard card={current} />
+          </div>
 
           {/* Navigation */}
           <div className="flex items-center justify-between gap-4">

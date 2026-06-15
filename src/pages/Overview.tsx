@@ -9,7 +9,7 @@ export default function Overview() {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 space-y-14">
 
       {/* Hero */}
-      <div className="space-y-4">
+      <div className="space-y-4 animate-fade-in-up">
         <div className="flex flex-wrap items-center gap-2">
           <Badge color="brand">CodeScreen</Badge>
           <Badge color="gray">NestJS + Prisma + SQLite</Badge>
@@ -38,10 +38,11 @@ export default function Overview() {
       <section className="space-y-4">
         <h2 className="text-xl font-semibold text-white">Three Repositories</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {repos.map(repo => (
+          {repos.map((repo, i) => (
             <div
               key={repo.id}
-              className="rounded-xl border border-gray-800 bg-surface-900 p-5 space-y-4 hover:border-gray-700 transition-colors"
+              className="rounded-xl border border-gray-800 bg-surface-900 p-5 space-y-4 hover:border-gray-700 transition-colors animate-fade-in-up"
+              style={{ animationDelay: `${120 + i * 80}ms` }}
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
@@ -68,10 +69,11 @@ export default function Overview() {
       <section className="space-y-4">
         <h2 className="text-xl font-semibold text-white">Key Facts — Know These Cold</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {keyFacts.map(fact => (
+          {keyFacts.map((fact, i) => (
             <div
               key={fact.label}
-              className="flex items-center justify-between gap-4 rounded-lg border border-gray-800 bg-surface-900 px-4 py-3 hover:border-gray-700 transition-colors"
+              className="flex items-center justify-between gap-4 rounded-lg border border-gray-800 bg-surface-900 px-4 py-3 hover:border-gray-700 transition-colors animate-slide-in-left"
+              style={{ animationDelay: `${300 + i * 50}ms` }}
             >
               <span className="text-sm text-gray-400 shrink-0">{fact.label}</span>
               <div className="flex items-center gap-2 min-w-0">

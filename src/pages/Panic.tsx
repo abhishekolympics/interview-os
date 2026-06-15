@@ -71,7 +71,7 @@ export default function Panic() {
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
 
       {phase === 'intro' && (
-        <div className="space-y-8">
+        <div className="space-y-8 animate-fade-in-up">
           <div className="space-y-3">
             <span className="text-xs font-mono text-danger-400 uppercase tracking-widest border border-danger-400/30 bg-danger-400/5 px-2 py-1 rounded">
               🚨 PANIC MODE
@@ -120,14 +120,14 @@ export default function Panic() {
       )}
 
       {phase === 'running' && bullet && (
-        <div className="space-y-6">
+        <div className={`space-y-6 rounded-2xl ${urgent ? 'animate-pulse-glow-red' : ''}`}>
           {/* Timer bar */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-mono text-gray-600">
                 Bullet {bulletIdx + 1} / {goldenBullets.length}
               </span>
-              <span className={`text-xl font-mono font-bold tabular-nums ${timerColor} transition-colors`}>
+              <span className={`text-xl font-mono font-bold tabular-nums ${timerColor} transition-colors ${urgent ? 'animate-heartbeat inline-block' : ''}`}>
                 {formatTime(secondsLeft)}
               </span>
             </div>
@@ -140,7 +140,9 @@ export default function Panic() {
           </div>
 
           {/* Bullet content */}
-          <div className="rounded-2xl border border-gray-800 bg-surface-900 overflow-hidden">
+          <div key={bulletIdx} className={`rounded-2xl border overflow-hidden animate-slide-in-left ${
+            urgent ? 'border-danger-400/30 bg-surface-900' : 'border-gray-800 bg-surface-900'
+          }`}>
             {/* Header */}
             <div className={`px-6 py-4 border-b border-gray-800 flex items-center gap-3 ${
               urgent ? 'bg-danger-400/5' : 'bg-surface-900'

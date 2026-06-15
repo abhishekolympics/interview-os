@@ -37,16 +37,18 @@ function FlowViewer({ steps, title }: { steps: FlowStep[]; title: string }) {
     <div className="space-y-3">
       <h3 className="text-base font-semibold text-white">{title}</h3>
       <div className="relative">
-        {/* Vertical timeline line */}
-        <div className="absolute left-5 top-6 bottom-6 w-px bg-gray-800" />
+        {/* Vertical timeline line with animated flow packet */}
+        <div className="absolute left-5 top-6 bottom-6 w-px bg-gray-800 overflow-hidden">
+          <div className="absolute left-0 top-0 w-full bg-gradient-to-b from-transparent via-brand-400/70 to-transparent animate-flow-packet" style={{ height: '60px' }} />
+        </div>
 
         <div className="space-y-2">
-          {steps.map((step) => {
+          {steps.map((step, si) => {
             const meta = layerMeta[step.layer];
             const isOpen = expanded.has(step.id);
 
             return (
-              <div key={step.id} className="relative pl-12">
+              <div key={step.id} className="relative pl-12 animate-fade-in-up" style={{ animationDelay: `${si * 50}ms` }}>
                 {/* Step dot */}
                 <button
                   onClick={() => toggle(step.id)}
@@ -156,24 +158,26 @@ export default function RequestFlow() {
       </div>
 
       {/* Flow viewer */}
-      {tab === 'bonus-shifts' && (
-        <FlowViewer
-          steps={bonusShiftsFlow}
-          title="GET /workers/:id/bonus-shifts — 10 Steps"
-        />
-      )}
-      {tab === 'claim' && (
-        <FlowViewer
-          steps={claimFlow}
-          title="POST /shifts/:id/claim — Claim a shift"
-        />
-      )}
-      {tab === 'cancel' && (
-        <FlowViewer
-          steps={cancelFlow}
-          title="POST /shifts/:id/cancel — Soft delete"
-        />
-      )}
+      <div key={tab} className="animate-fade-in">
+        {tab === 'bonus-shifts' && (
+          <FlowViewer
+            steps={bonusShiftsFlow}
+            title="GET /workers/:id/bonus-shifts — 10 Steps"
+          />
+        )}
+        {tab === 'claim' && (
+          <FlowViewer
+            steps={claimFlow}
+            title="POST /shifts/:id/claim — Claim a shift"
+          />
+        )}
+        {tab === 'cancel' && (
+          <FlowViewer
+            steps={cancelFlow}
+            title="POST /shifts/:id/cancel — Soft delete"
+          />
+        )}
+      </div>
 
     </div>
   );
