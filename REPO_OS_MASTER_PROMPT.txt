@@ -1,0 +1,491 @@
+REPO OS — MASTER PROMPT
+=======================
+
+WHAT THIS IS
+------------
+
+You are building Repo OS — a visual, interactive system for developing genuine
+understanding of code repositories. It is not documentation. It is not a study
+guide. It is not an interview simulator.
+
+It is closer to Brilliant than to Confluence. Closer to Duolingo than to GitBook.
+
+The single test for every screen you build: "Why would I stay here for ten minutes?"
+
+If a screen fails that test, redesign it before shipping it.
+
+
+THE FOUNDATIONAL INSIGHT
+------------------------
+
+Documentation transforms content into pages.
+
+Repo OS transforms content into experiences.
+
+The difference:
+
+  Documentation           Repo OS
+  ---------------------   ---------------------
+  Shows what              Teaches why
+  User reads              User discovers
+  Static pages            Living systems
+  You scroll              You explore
+  Information stored      Understanding built
+
+Every design decision flows from this.
+
+
+THE THREE REPOSITORIES
+----------------------
+
+Repo OS supports exactly three repositories. They must never be mixed.
+
+  ID                    Label                   Character
+  --------              --------------------    -----------------------------------------------
+  fqai9cn3              Bonus Shifts            Primary submission. Cursor pagination,
+                                                DB-driven bonus rates, 3-query algorithm.
+
+  fqai9cn3_interview    Bonus Shifts            Comparison version. Offset pagination,
+                        (Interview)             hardcoded rates, e2e tests.
+
+  ncdz1yed              Top Workplaces          Separate codebase. Different domain,
+                                                different patterns.
+
+All progress, flashcard state, mastery scores, and sessions are namespaced per
+repository. A card mastered in Bonus Shifts is not mastered in Top Workplaces.
+State never bleeds across repos.
+
+
+FIRST SCREEN: REPOSITORY SELECTOR
+----------------------------------
+
+The very first screen is repository selection. No exceptions.
+
+The user must choose before anything loads.
+
+This screen should feel like choosing a mission, not navigating a menu.
+
+Each repository card shows:
+- Repository name and identity (what it is)
+- Current mastery percentage for that repo (if studied before)
+- A one-line description of what makes it distinct
+- Visual differentiation between repos (color coding, iconography)
+
+The selected repository persists in localStorage. On return visits, the user
+lands on their last-used repository's Command Center — but can always switch.
+
+The repository context must be globally available and drive all downstream
+behavior.
+
+
+COMMAND CENTER
+--------------
+
+The Command Center is the hub for each repository. It is not a dashboard — it
+is a command center. The distinction matters.
+
+A dashboard displays data.
+
+A command center answers: What should I do next?
+
+The Command Center must answer:
+- What do I understand well?
+- What am I weak on?
+- Where should I go now?
+- How close am I to full comprehension?
+
+COMPREHENSION SCORE
+
+Replace "Readiness Score" with "Comprehension Score." The score measures
+repository understanding, not interview readiness.
+
+The score is still computed from SM-2 mastery (because mastery of flashcards is
+a proxy for understanding). But the framing matters. The label should read
+COMPREHENSION, not READINESS.
+
+PRIORITY RECOMMENDATION
+
+One prominent card that says exactly what to do next. Not a list of modules.
+Not a navigation menu. One recommendation, calculated based on:
+- Cards due
+- Weakest topic
+- Least-visited module
+- Time since last session
+
+Example: "You're weak on cursor pagination. The Request Lab shows it in motion
+— go there."
+
+TOPIC HEAT MAP
+
+Replace the bar chart with a heat map. Topics are shown as tiles. Dark tiles =
+not understood. Bright tiles = mastered.
+
+The user should feel something when they see a dark tile. They should want to
+illuminate it.
+
+NAVIGATION
+
+All modules accessible from the Command Center. Module cards show live state —
+card counts, due counts, last visited — so the user always knows what's fresh
+and what's stale.
+
+
+MODULE: ARCHITECTURE LAB
+-------------------------
+
+CURRENT PROBLEM
+
+The Architecture Lab is currently a static diagram with boxes and arrows. It is
+essentially an annotated README.
+
+WHAT IT MUST BECOME
+
+The Architecture Lab should feel like exploring a city.
+
+Nodes represent modules, services, and providers. Edges represent dependencies
+and data flow. The user can:
+
+- Click any node to expand it and see what it contains
+- Hover an edge to see what flows along it
+- Animate a request moving through the dependency chain
+- Highlight all nodes that a given file touches
+- Dim everything not connected to the selected node
+
+The diagram should be built with D3 or Framer Motion, not static HTML boxes.
+Nodes should have physics. Edges should have directionality.
+
+The user should be able to ask: "What happens when WorkersController receives a
+request?" — and watch the answer play out as a live animation through the graph.
+
+CONTENT REQUIREMENTS PER REPO
+
+Each repository has its own module graph and DI chain. The component data is
+already defined in src/data/overview.ts and in the Architecture page. Lift that
+data into per-repo config files. Do not hardcode it into the component.
+
+
+MODULE: REQUEST LAB
+-------------------
+
+CURRENT PROBLEM
+
+The Request Lab is a good start — it has interactive inputs and mock responses.
+But it teaches what happens, not why it happens.
+
+WHAT IT MUST BECOME
+
+Every endpoint interaction should produce a step-by-step visual trace of the
+request.
+
+When the user fires a request:
+
+1. The request appears as a node entering the system
+2. Each step in breakdown[] fires sequentially, with motion
+3. Each step highlights which part of the code is executing
+4. Database queries animate as they emit results
+5. The response materializes from the assembled data
+
+The user should see: Request -> Validation -> Service -> Queries -> Mapper ->
+Response
+
+Each step should be pauseable. The user should be able to hover any step and
+see the code that runs at that point.
+
+The goal is not to simulate a real API. The goal is to build a mental model of
+how the data flows. Every animation should communicate causality.
+
+BREAKDOWN VISIBILITY
+
+The breakdown[] array in each endpoint definition is currently shown as a static
+bullet list. It must become the script for the animation. One bullet = one step
+in the visual trace.
+
+
+MODULE: MEMORY PALACE
+---------------------
+
+The SM-2 spaced repetition system is excellent. Keep it.
+
+The name "Memory Palace" is good. Keep it.
+
+What must change: repo isolation.
+
+Cards, decks, and progress must be fully scoped to the active repository. The
+flashcard data files (flashcards.ts) must be split into per-repo modules. The
+SM-2 state key in localStorage must be namespaced by repo ID.
+
+The card study experience itself is already good (flip mechanic, ratings,
+keyboard shortcuts). Do not break it.
+
+What can be improved: show the source file for each card more prominently. The
+source field on each flashcard (workers.service.ts:150-170) should be a visible,
+styled reference — not a hidden field. When the user sees the answer, they
+should always know where in the codebase this fact lives.
+
+
+MODULE: PANIC MODE
+------------------
+
+Panic Mode is correct as designed.
+
+One click. Everything critical. One screen. No navigation. No exploration.
+
+The only change: panic content must be per-repo. The Bonus Shifts repo has
+different golden bullets than the Top Workplaces repo.
+
+The visual design can be improved — it should feel genuinely urgent, like a
+flight checklist in the cockpit. Red ambient glow. Countdown aesthetic. Dense
+but scannable.
+
+
+MODULE: STEFAN MODE
+-------------------
+
+Stefan Mode is an adversarial interview simulator. It is real and useful.
+
+It is also secondary.
+
+Stefan Mode exists for users who have already built comprehension through the
+other modules and want to pressure-test it. It should not be the first thing a
+user reaches for.
+
+In the Command Center, Stefan Mode should appear after the primary learning
+modules. It should carry a label like "Pressure Test" or appear in a section
+called "When you're ready."
+
+Stefan Mode must also be repo-scoped. The questions, the model answers, and the
+session history all belong to a specific repository.
+
+
+MODULE: CODE WALK (NEW)
+------------------------
+
+This module does not exist yet. It must be created.
+
+The Code Walk is a guided spatial tour of the repository.
+
+Not a file tree. Not a folder listing. A guided narrative that moves through
+the codebase with purpose.
+
+STRUCTURE
+
+Each repository has a pre-defined Code Walk with 6-10 stops. Each stop is:
+- A file (or a function within a file)
+- A short explanation of why this file matters (not what it is)
+- A visual annotation highlighting the key lines
+- A connection to what came before and what comes next
+
+The user moves through the walk with next/previous navigation. Motion carries
+them forward — each stop should feel like arriving somewhere, not just
+scrolling.
+
+EXAMPLE STOPS FOR BONUS SHIFTS
+
+1. Entry point: workers.controller.ts — how the request arrives
+2. Validation: the Zod pipe — why it exists before the service is called
+3. The algorithm: getBonusShifts — where the logic actually lives
+4. Query 1: streak detection — what we're asking the database
+5. Short-circuit: the empty map check — why this prevents unnecessary work
+6. Query 3: next-week shifts — cursor pagination in action
+7. The mapper: bonus percent merges with shift data
+8. The response shape: what leaves the system
+
+After completing the Code Walk, the user should be able to narrate the entire
+request lifecycle from memory. That is the success condition.
+
+
+VISUAL PHILOSOPHY
+-----------------
+
+REFERENCE
+
+The visual language should feel like a native app from this list:
+- Arc Browser (glass, layered surfaces, alive)
+- Linear (dense, precise, premium dark)
+- Raycast (command-first, keyboard-native, deliberate)
+- Brilliant (learning feels earned, not consumed)
+
+It must not feel like any of these:
+- Confluence
+- Notion
+- GitBook
+- MkDocs
+- Docusaurus
+
+COLOR SYSTEM
+
+The existing color system (surface-950, brand-500, accent-400, etc.) is good.
+Keep it. Do not redesign colors.
+
+What must change: depth and layering. The current app is flat. Surfaces should
+feel like they exist at different heights. Cards should cast subtle shadows.
+The active state should feel three-dimensional.
+
+TYPOGRAPHY
+
+Mono for labels, code references, metric counts, status tags.
+Serif or display weight for primary headings on hero moments.
+Clean sans-serif for body content.
+
+The typeface hierarchy should communicate: this is a precision instrument,
+not a website.
+
+AMBIENT ELEMENTS
+
+Every major page should have at least one ambient element that makes the space
+feel alive:
+- Gradient orbs that pulse slowly
+- Particles that drift at low opacity
+- Grid lines that glow on interaction
+- Animated borders on focus
+
+These should never distract. They exist to make the user feel they are inside
+a living system.
+
+
+MOTION PHILOSOPHY
+-----------------
+
+Framer Motion is the motion library. It is mandatory.
+
+RULES FOR MOTION
+
+Motion communicates meaning. Every animation answers: what is this element's
+relationship to something else?
+
+- x/y transitions: element is arriving from or departing to a related location
+- scale: element is becoming more or less important
+- opacity: element is entering or leaving the user's focus
+- staggerChildren: items in a group belong together
+
+Motion is never decoration. If removing an animation doesn't reduce
+understanding, remove it.
+
+Transitions should feel physical. Not ease-in-out. Use spring physics for
+interactive elements. Use easeOut cubic for passive reveals. Nothing should
+feel instant; nothing should feel sluggish.
+
+SPECIFIC MOTION REQUIREMENTS
+
+- Page transitions: shared-element or slide transitions between modules
+- Card flips: real 3D rotation on the Y axis
+- Graph animations: nodes should enter with spring physics, edges should draw
+  themselves
+- Request trace: each step should visually "hand off" to the next
+- Stats count up on mount (already implemented — keep it)
+- Progress bars animate from 0 on first render (already implemented — keep it)
+
+
+TECHNICAL ARCHITECTURE
+-----------------------
+
+STACK
+
+React 18 + TypeScript + Tailwind CSS + Framer Motion
+
+Keep what exists. Do not switch libraries. Do not introduce new frameworks.
+
+REPOSITORY ISOLATION
+
+Create a RepoContext with:
+- activeRepo: RepoConfig
+- setActiveRepo: (id: string) => void
+
+RepoConfig type:
+
+  interface RepoConfig {
+    id: string
+    label: string
+    description: string
+    flashcards: Flashcard[]
+    decks: Deck[]
+    requestFlows: Endpoint[]
+    architectureGraph: GraphData
+    codeWalk: CodeWalkStop[]
+    goldenBullets: GoldenBullet[]
+    stefanScenarios: Scenario[]
+  }
+
+All data files must be restructured as per-repo modules under:
+
+  src/data/repos/[repoId]/
+
+The root data files (flashcards.ts, requestFlow.ts, etc.) become re-exports
+of the active repo's data.
+
+LOCALSTORAGE NAMESPACING
+
+  SM-2 state key:       sm2_state_[repoId]
+  Stefan session count: stefan_sessions_[repoId]
+  Last visited repo:    last_repo
+
+ROUTING
+
+  /                           Repository selector
+  /[repoId]/                  Command Center
+  /[repoId]/architecture      Architecture Lab
+  /[repoId]/request-lab       Request Lab
+  /[repoId]/memory-palace     Memory Palace
+  /[repoId]/code-walk         Code Walk
+  /[repoId]/panic             Panic Mode
+  /[repoId]/stefan            Stefan Mode
+
+The repoId in the URL drives the active repo context.
+
+DATA REQUIREMENTS
+
+Do not generate new content. The content already exists. The task is to
+restructure existing content into the per-repo data format and connect it to
+the new UI.
+
+Existing content that must be preserved:
+- All 122 flashcards (5 decks)
+- All endpoint definitions with breakdown[] arrays
+- All golden bullets
+- All Stefan scenarios
+- All architecture data (DI chain, module tree, endpoints)
+- All overview/comparison data
+
+
+SUCCESS CRITERIA
+----------------
+
+The application succeeds if a user can:
+
+1. Open the app and within 30 seconds understand which repository they're in
+
+2. Spend 10 minutes in the Architecture Lab and afterward correctly describe
+   the module dependency chain from memory — without looking
+
+3. Fire a request in the Request Lab and explain every step that happened,
+   in order, with causality
+
+4. After three Memory Palace sessions, recall the difference between cursor
+   and offset pagination without prompting
+
+5. After the Code Walk, narrate the full request lifecycle end-to-end
+
+The application fails if:
+- A user would describe it as "a well-organized README"
+- A user opens it and immediately starts reading long text blocks
+- A user can navigate the entire app without their mental model of the
+  codebase changing
+
+
+THE ONE SENTENCE
+----------------
+
+Every design decision should be evaluated against one sentence.
+
+When the user closes the app, the desired reaction is:
+
+  "Damn, I finally understand this repo."
+
+Not: "Damn, I'm interview-ready."
+Not: "Damn, great documentation."
+
+Understanding is the product.
+
+=======================
+END OF MASTER PROMPT
+=======================

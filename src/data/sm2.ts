@@ -21,23 +21,49 @@ export interface OSState {
   lastVisit: string;
 }
 
-const STORAGE_KEY = 'interview_os_state';
+const DEFAULT_KEY = 'interview_os_state';
 
 function todayStr(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-export function loadState(): OSState {
+// ── Per-repo key helpers ──────────────────────────────────────────────────────
+
+/**
+ * Returns the localStorage key for SM-2 state.
+ * No repoId → default key (backward compatible).
+ * With repoId → 'sm2_state_[repoId]'
+ */
+export function getSM2Key(repoId?: string): string {
+  if (!repoId) return DEFAULT_KEY;
+  return `sm2_state_${repoId}`;
+}
+
+/**
+ * Returns the localStorage key for Stefan session count.
+ * No repoId → 'stefan_sessions_default'
+ * With repoId → 'stefan_sessions_[repoId]'
+ */
+export function getStefanKey(repoId?: string): string {
+  if (!repoId) return 'stefan_sessions_default';
+  return `stefan_sessions_${repoId}`;
+}
+
+// ── State persistence ─────────────────────────────────────────────────────────
+
+export function loadState(repoId?: string): OSState {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(getSM2Key(repoId));
     if (raw) return JSON.parse(raw) as OSState;
   } catch {}
   return { cards: {}, sessions: [], stefanSessions: 0, panicSessions: 0, lastVisit: todayStr() };
 }
 
-export function saveState(s: OSState): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+export function saveState(s: OSState, repoId?: string): void {
+  localStorage.setItem(getSM2Key(repoId), JSON.stringify(s));
 }
+
+// ── Card state ────────────────────────────────────────────────────────────────
 
 export function getCardState(state: OSState, cardId: string): CardState {
   return state.cards[cardId] ?? {

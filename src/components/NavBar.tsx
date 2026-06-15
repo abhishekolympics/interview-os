@@ -1,31 +1,48 @@
 import { useState } from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink, Link, useParams, useNavigate } from 'react-router-dom';
+import { useRepo } from '../contexts/RepoContext';
 
-const primaryLinks = [
-  { to: '/',              label: 'Mission Control', end: true },
-  { to: '/memory-palace', label: 'Memory Palace',   end: false },
-  { to: '/stefan',        label: 'Stefan',          end: false },
-  { to: '/panic',         label: 'Panic Mode',      end: false },
-];
-
-const secondaryLinks = [
-  { to: '/request-lab',   label: 'Request Lab' },
-  { to: '/request-flow',  label: 'Request Flow' },
-  { to: '/architecture',  label: 'Architecture' },
-  { to: '/overview',      label: 'Repo Overview' },
-];
+const COLOR_CLASSES: Record<string, { dot: string; badge: string }> = {
+  blue:   { dot: 'bg-blue-400',   badge: 'text-blue-400 bg-blue-400/10'   },
+  purple: { dot: 'bg-purple-400', badge: 'text-purple-400 bg-purple-400/10' },
+  amber:  { dot: 'bg-amber-400',  badge: 'text-amber-400 bg-amber-400/10'  },
+};
 
 export default function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { repoId } = useParams<{ repoId: string }>();
+  const { activeRepo } = useRepo();
+  const navigate = useNavigate();
+
+  const base = `/${repoId}`;
+
+  const primaryLinks = [
+    { to: `${base}`,               label: 'Command Center', end: true  },
+    { to: `${base}/memory-palace`, label: 'Memory Palace',  end: false },
+    { to: `${base}/code-walk`,     label: 'Code Walk',      end: false },
+    { to: `${base}/request-lab`,   label: 'Request Lab',    end: false },
+  ];
+
+  const secondaryLinks = [
+    { to: `${base}/architecture`, label: 'Architecture Lab' },
+    { to: `${base}/panic`,        label: 'Panic Mode'       },
+    { to: `${base}/stefan`,       label: 'Stefan Mode'      },
+  ];
+
+  const colors = COLOR_CLASSES[activeRepo.color] ?? COLOR_CLASSES.blue;
 
   return (
     <nav className="sticky top-0 z-50 border-b border-gray-800 bg-surface-950/95 backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
 
-        {/* Brand */}
-        <Link to="/" className="flex items-center gap-2 shrink-0">
-          <span className="text-brand-400 font-mono font-bold text-sm tracking-widest">INTERVIEW OS</span>
+        {/* Brand + active repo indicator */}
+        <Link to={base} className="flex items-center gap-2 shrink-0">
+          <span className="text-brand-400 font-mono font-bold text-sm tracking-widest">REPO OS</span>
           <span className="hidden md:inline text-gray-600 text-xs font-mono">/ Red Planet</span>
+          <span className={`hidden md:inline-flex items-center gap-1.5 ml-1 px-2 py-0.5 rounded-full text-xs font-semibold ${colors.badge}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${colors.dot}`} />
+            {activeRepo.shortLabel}
+          </span>
         </Link>
 
         {/* Desktop nav */}
@@ -65,6 +82,17 @@ export default function NavBar() {
               {label}
             </NavLink>
           ))}
+
+          {/* Separator */}
+          <span className="w-px h-4 bg-gray-800 mx-1.5" />
+
+          {/* Switch Repo */}
+          <button
+            onClick={() => navigate('/')}
+            className="px-3 py-1.5 rounded-md text-xs font-medium transition-colors text-gray-500 hover:text-gray-200 hover:bg-white/5 border border-gray-800 hover:border-gray-600"
+          >
+            Switch Repo
+          </button>
         </div>
 
         {/* Mobile hamburger */}
@@ -82,6 +110,12 @@ export default function NavBar() {
       {/* Mobile drawer */}
       {menuOpen && (
         <div className="md:hidden border-t border-gray-800 bg-surface-950 px-4 py-4 space-y-1" onClick={() => setMenuOpen(false)}>
+          {/* Active repo pill */}
+          <div className={`flex items-center gap-2 px-4 py-2 mb-2 rounded-lg text-xs font-semibold ${colors.badge}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${colors.dot}`} />
+            {activeRepo.label}
+          </div>
+
           {[...primaryLinks, ...secondaryLinks].map(({ to, label }) => (
             <NavLink
               key={to}
@@ -97,6 +131,14 @@ export default function NavBar() {
               {label}
             </NavLink>
           ))}
+
+          {/* Switch Repo in mobile */}
+          <button
+            onClick={() => navigate('/')}
+            className="block w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-500 hover:text-gray-200 hover:bg-white/5 border border-gray-800 hover:border-gray-600 mt-2"
+          >
+            Switch Repo
+          </button>
         </div>
       )}
     </nav>
