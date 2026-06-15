@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { flashcards, decks, type Flashcard } from '../data/flashcards';
 import Badge from '../components/Badge';
 
@@ -96,6 +96,15 @@ export default function Flashcards() {
     setActiveDeck(id);
     setCardIdx(0);
   };
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') prev();
+      if (e.key === 'ArrowRight') next();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [prev, next]);
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 space-y-10">

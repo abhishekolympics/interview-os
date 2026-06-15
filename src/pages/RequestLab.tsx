@@ -169,6 +169,7 @@ export default function RequestLab() {
   const [selected, setSelected] = useState<Endpoint>(endpoints[0]);
   const [values, setValues] = useState<Record<string, string>>({});
   const [ran, setRan] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const allParams = useMemo(() => {
     const map: Record<string, string> = {};
@@ -196,11 +197,25 @@ export default function RequestLab() {
     setSelected(ep);
     setValues({});
     setRan(false);
+    setValidationError(null);
   };
 
   const setValue = (name: string, val: string) => {
     setValues(prev => ({ ...prev, [name]: val }));
     setRan(false);
+    setValidationError(null);
+  };
+
+  const run = () => {
+    const allRequired = [...selected.pathParams, ...selected.queryParams, ...selected.bodyParams]
+      .filter(p => p.required);
+    const missing = allRequired.filter(p => !allParams[p.name]?.trim());
+    if (missing.length > 0) {
+      setValidationError(`Required field${missing.length > 1 ? 's' : ''} missing: ${missing.map(p => p.name).join(', ')}`);
+      return;
+    }
+    setValidationError(null);
+    setRan(true);
   };
 
   return (
@@ -249,7 +264,7 @@ export default function RequestLab() {
               </span>
               <code className="text-sm text-gray-200 font-mono flex-1">{buildUrl()}</code>
               <button
-                onClick={() => setRan(true)}
+                onClick={run}
                 className="shrink-0 px-4 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold transition-colors"
               >
                 Run →
@@ -286,6 +301,14 @@ export default function RequestLab() {
             </div>
           </div>
 
+          {/* Validation error */}
+          {validationError && (
+            <div className="flex items-center gap-2 rounded-xl border border-danger-400/30 bg-danger-400/5 px-4 py-3 text-xs text-danger-400">
+              <span>⚠</span>
+              <span>{validationError}</span>
+            </div>
+          )}
+
           {/* Response */}
           {ran && (
             <div className="space-y-3">
@@ -300,18 +323,20 @@ export default function RequestLab() {
             </div>
           )}
 
-          {/* Breakdown */}
-          <div className="space-y-3">
-            <p className="text-xs font-mono text-gray-600 uppercase tracking-widest">What happens inside</p>
-            <div className="space-y-1.5">
-              {selected.breakdown.map((step, i) => (
-                <div key={i} className="flex items-start gap-3 rounded-lg border border-gray-800 bg-surface-900 px-4 py-3">
-                  <span className="text-xs font-mono text-gray-700 w-4 shrink-0 mt-0.5">{i + 1}</span>
-                  <p className="text-xs text-gray-300 leading-relaxed">{step}</p>
-                </div>
-              ))}
+          {/* Breakdown — only shown after running */}
+          {ran && (
+            <div className="space-y-3">
+              <p className="text-xs font-mono text-gray-600 uppercase tracking-widest">What happens inside</p>
+              <div className="space-y-1.5">
+                {selected.breakdown.map((step, i) => (
+                  <div key={i} className="flex items-start gap-3 rounded-lg border border-gray-800 bg-surface-900 px-4 py-3">
+                    <span className="text-xs font-mono text-gray-700 w-4 shrink-0 mt-0.5">{i + 1}</span>
+                    <p className="text-xs text-gray-300 leading-relaxed">{step}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
         </div>
       </div>

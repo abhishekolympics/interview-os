@@ -57,11 +57,13 @@ function QCard({
   onRate,
   idx,
   total,
+  sessionPreset,
 }: {
   script: StefanScript;
   onRate: (q: number) => void;
   idx: number;
   total: number;
+  sessionPreset: StefanPreset;
 }) {
   const [revealed, setReveal] = useState(false);
   const [answer, setAnswer] = useState('');
@@ -96,7 +98,7 @@ function QCard({
           </div>
           <div>
             <p className="text-sm font-semibold text-white">Stefan</p>
-            <p className="text-xs text-gray-600 capitalize">{script.preset} mode</p>
+            <p className="text-xs text-gray-600 capitalize">{presetMeta[sessionPreset].label} mode</p>
           </div>
         </div>
         <blockquote className="text-base text-gray-100 leading-relaxed border-l-2 border-brand-500 pl-4">
@@ -312,6 +314,7 @@ export default function Stefan() {
             onRate={handleRate}
             idx={idx}
             total={queue.length}
+            sessionPreset={preset}
           />
 
           <button
